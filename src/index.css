@@ -2,95 +2,134 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
+/* MCMV Simulator Design System
+   Professional real estate financial app with trust-building aesthetics
+   Primary: Deep Navy Blue - trust, professionalism
+   Accent: Warm Amber - highlights, CTAs
+   Success: Emerald - positive indicators
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core Colors - Deep Navy Professional Theme */
+    --background: 210 20% 98%;
+    --foreground: 215 25% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 215 25% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 215 25% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
+    /* Deep Navy Blue - Primary Trust Color */
+    --primary: 215 50% 23%;
     --primary-foreground: 210 40% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Light Gray Blue - Secondary */
+    --secondary: 210 25% 93%;
+    --secondary-foreground: 215 25% 25%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted backgrounds */
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 15% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Warm Amber - Accent/Highlight */
+    --accent: 38 92% 50%;
+    --accent-foreground: 38 100% 15%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Destructive - Errors */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Success - Emerald */
+    --success: 152 69% 40%;
+    --success-foreground: 0 0% 100%;
 
-    --radius: 0.5rem;
+    /* Warning - Orange */
+    --warning: 25 95% 53%;
+    --warning-foreground: 25 100% 15%;
 
-    --sidebar-background: 0 0% 98%;
+    /* Info - Blue */
+    --info: 200 98% 39%;
+    --info-foreground: 0 0% 100%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Borders and inputs */
+    --border: 214 20% 88%;
+    --input: 214 20% 88%;
+    --ring: 215 50% 23%;
 
-    --sidebar-primary: 240 5.9% 10%;
+    --radius: 0.625rem;
 
-    --sidebar-primary-foreground: 0 0% 98%;
+    /* Sidebar */
+    --sidebar-background: 215 50% 18%;
+    --sidebar-foreground: 210 40% 95%;
+    --sidebar-primary: 38 92% 50%;
+    --sidebar-primary-foreground: 38 100% 15%;
+    --sidebar-accent: 215 45% 25%;
+    --sidebar-accent-foreground: 210 40% 95%;
+    --sidebar-border: 215 40% 25%;
+    --sidebar-ring: 38 92% 50%;
 
-    --sidebar-accent: 240 4.8% 95.9%;
+    /* Custom Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(215 50% 23%), hsl(215 55% 35%));
+    --gradient-accent: linear-gradient(135deg, hsl(38 92% 50%), hsl(45 100% 55%));
+    --gradient-success: linear-gradient(135deg, hsl(152 69% 40%), hsl(152 60% 50%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(210 20% 98%));
 
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Shadows */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    --shadow-card: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1);
+    --shadow-elevated: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
+    --background: 215 30% 10%;
     --foreground: 210 40% 98%;
 
-    --card: 222.2 84% 4.9%;
+    --card: 215 30% 14%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 222.2 84% 4.9%;
+    --popover: 215 30% 14%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 38 92% 50%;
+    --primary-foreground: 38 100% 10%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 215 30% 20%;
     --secondary-foreground: 210 40% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 215 30% 18%;
+    --muted-foreground: 215 15% 60%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 38 100% 10%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --success: 152 60% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 25 90% 48%;
+    --warning-foreground: 0 0% 100%;
+
+    --info: 200 90% 50%;
+    --info-foreground: 0 0% 100%;
+
+    --border: 215 30% 22%;
+    --input: 215 30% 22%;
+    --ring: 38 92% 50%;
+
+    --sidebar-background: 215 35% 12%;
+    --sidebar-foreground: 210 40% 95%;
+    --sidebar-primary: 38 92% 50%;
+    --sidebar-primary-foreground: 38 100% 10%;
+    --sidebar-accent: 215 35% 18%;
+    --sidebar-accent-foreground: 210 40% 95%;
+    --sidebar-border: 215 30% 20%;
+    --sidebar-ring: 38 92% 50%;
   }
 }
 
@@ -100,6 +139,189 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    @apply bg-muted rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-muted-foreground/30 rounded-full hover:bg-muted-foreground/50;
+  }
+}
+
+@layer components {
+  /* Card variants */
+  .card-elevated {
+    @apply bg-card rounded-lg border shadow-md;
+  }
+
+  .card-summary {
+    @apply bg-card rounded-xl border p-6 shadow-sm transition-all hover:shadow-md;
+  }
+
+  /* Summary stat cards */
+  .stat-card {
+    @apply flex flex-col gap-1 rounded-xl border bg-card p-4 shadow-sm;
+  }
+
+  .stat-card-primary {
+    @apply stat-card border-primary/20 bg-primary/5;
+  }
+
+  .stat-card-accent {
+    @apply stat-card border-accent/30 bg-accent/10;
+  }
+
+  .stat-card-success {
+    @apply stat-card border-success/30 bg-success/10;
+  }
+
+  /* Wizard step indicator */
+  .wizard-step {
+    @apply flex items-center gap-2;
+  }
+
+  .wizard-step-number {
+    @apply flex h-8 w-8 items-center justify-center rounded-full text-sm font-semibold transition-all;
+  }
+
+  .wizard-step-number-active {
+    @apply wizard-step-number bg-primary text-primary-foreground;
+  }
+
+  .wizard-step-number-completed {
+    @apply wizard-step-number bg-success text-success-foreground;
+  }
+
+  .wizard-step-number-pending {
+    @apply wizard-step-number bg-muted text-muted-foreground;
+  }
+
+  /* Input styles */
+  .input-currency {
+    @apply text-right font-mono tabular-nums;
+  }
+
+  /* Table styles */
+  .table-flow {
+    @apply w-full text-sm;
+  }
+
+  .table-flow th {
+    @apply border-b bg-muted/50 px-3 py-2 text-left font-semibold text-muted-foreground;
+  }
+
+  .table-flow td {
+    @apply border-b px-3 py-2;
+  }
+
+  .table-flow tr:hover td {
+    @apply bg-muted/30;
+  }
+
+  /* Phase indicators */
+  .phase-badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+
+  .phase-fundacao {
+    @apply phase-badge bg-blue-100 text-blue-800;
+  }
+
+  .phase-estrutura {
+    @apply phase-badge bg-amber-100 text-amber-800;
+  }
+
+  .phase-acabamento {
+    @apply phase-badge bg-purple-100 text-purple-800;
+  }
+
+  .phase-conclusao {
+    @apply phase-badge bg-green-100 text-green-800;
+  }
+
+  /* Presentation mode styles */
+  .presentation-mode .technical-field {
+    @apply hidden;
+  }
+
+  .presentation-mode .client-friendly {
+    @apply block;
+  }
+
+  /* Animations */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slide-in-right {
+    from {
+      opacity: 0;
+      transform: translateX(20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes pulse-glow {
+    0%, 100% {
+      box-shadow: 0 0 0 0 hsl(38 92% 50% / 0.4);
+    }
+    50% {
+      box-shadow: 0 0 0 8px hsl(38 92% 50% / 0);
+    }
+  }
+
+  .animate-fade-in {
+    animation: fade-in 0.3s ease-out;
+  }
+
+  .animate-slide-in-right {
+    animation: slide-in-right 0.4s ease-out;
+  }
+
+  .animate-pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+}
+
+@layer utilities {
+  /* Currency formatting helper */
+  .currency {
+    @apply font-mono tabular-nums;
+  }
+
+  /* Percentage formatting helper */
+  .percentage {
+    @apply font-mono tabular-nums;
+  }
+
+  /* Gradient text */
+  .text-gradient-primary {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-primary);
+  }
+
+  .text-gradient-accent {
+    @apply bg-clip-text text-transparent;
+    background-image: var(--gradient-accent);
   }
 }
