@@ -33,6 +33,9 @@ const defaultSimulationParams: SimulationParams = {
     { id: generateId(), name: 'Conclusão', percentage: 100, duration_months: 3 },
   ],
   apply_annual_adjustment: false,
+  has_documentation: false,
+  discount: 0,
+  has_guarantor: false,
 };
 
 const defaultApprovalLetter: ApprovalLetter = {
