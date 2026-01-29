@@ -64,6 +64,10 @@ export interface SimulationParams {
   entry_bands: EntryBand[];
   construction_phases: ConstructionPhase[];
   apply_annual_adjustment: boolean;
+  // Novos campos para cálculo de fechamento
+  has_documentation: boolean;
+  discount: number;
+  has_guarantor: boolean;
 }
 
 export interface Campaign {
