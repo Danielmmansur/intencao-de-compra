@@ -1,4 +1,5 @@
-import type { ApprovalLetter, SimulationParams, Property, Campaign } from '@/types/proposal';
+import type { ApprovalLetter, SimulationParams, Property, Campaign, Client } from '@/types/proposal';
+import { getEmpreendimentoById, calculateMonthlyConstructionFee } from '@/data/empreendimentos';
 
 export interface ProSolutoFlowRow {
   month: number;
@@ -6,6 +7,7 @@ export interface ProSolutoFlowRow {
   proSolutoPayment: number;
   constructionFee: number;
   total: number;
+  incomeCommitmentPercentage: number;
   notes?: string;
 }
 
@@ -19,6 +21,16 @@ export interface ProSolutoSummary {
   entryValue: number;
   proSolutoTotal: number;
   financedValue: number;
+}
+
+export interface IncomeBasedFlowResult {
+  flow: ProSolutoFlowRow[];
+  totalPaid: number;
+  residualBalance: number;
+  hasResidualBalance: boolean;
+  monthlyIncomeCeiling: number;
+  commitmentPercentage: number;
+  monthsToPayOff: number;
 }
 
 export function calculateProSolutoSummary(
@@ -65,11 +77,136 @@ export function calculateProSolutoSummary(
   };
 }
 
+/**
+ * Calculate income commitment percentage based on guarantor status
+ * @param hasGuarantor - Whether the client has a guarantor
+ * @returns Commitment percentage (30% or 35%)
+ */
+export function getCommitmentPercentage(hasGuarantor: boolean): number {
+  return hasGuarantor ? 35 : 30;
+}
+
+/**
+ * Calculate the monthly income ceiling for payments
+ * @param totalFamilyIncome - Total family gross income
+ * @param hasGuarantor - Whether the client has a guarantor
+ * @returns The maximum monthly payment the client can afford
+ */
+export function calculateMonthlyIncomeCeiling(
+  totalFamilyIncome: number,
+  hasGuarantor: boolean
+): number {
+  const percentage = getCommitmentPercentage(hasGuarantor);
+  return (totalFamilyIncome * percentage) / 100;
+}
+
+/**
+ * Generate payment flow based on income commitment rules
+ * The Pro Soluto payment is calculated as: Ceiling - Construction Fee
+ * This ensures the total never exceeds the client's income limit
+ */
+export function generateIncomeBasedProSolutoFlow(
+  summary: ProSolutoSummary,
+  simulationParams: SimulationParams,
+  totalFamilyIncome: number,
+  property: Property
+): IncomeBasedFlowResult {
+  const flow: ProSolutoFlowRow[] = [];
+  const { entry_term_months, simulation_start_date, has_guarantor } = simulationParams;
+  
+  const startDate = new Date(simulation_start_date);
+  const empreendimento = getEmpreendimentoById(property.empreendimento_id || '');
+  const constructionMonths = empreendimento?.constructionMonths || simulationParams.construction_months;
+  
+  // Calculate income ceiling
+  const commitmentPercentage = getCommitmentPercentage(has_guarantor);
+  const monthlyIncomeCeiling = calculateMonthlyIncomeCeiling(totalFamilyIncome, has_guarantor);
+  
+  let remainingProSoluto = summary.proSolutoTotal;
+  let totalPaid = 0;
+  let monthsToPayOff = 0;
+  
+  // Generate flow for the entry term or until Pro Soluto is paid off
+  const totalMonths = Math.max(entry_term_months, constructionMonths + 6);
+  
+  for (let month = 1; month <= totalMonths; month++) {
+    const currentDate = new Date(startDate);
+    currentDate.setMonth(currentDate.getMonth() + month - 1);
+    
+    const isWithinEntryTerm = month <= entry_term_months;
+    const isConstructionPeriod = month <= constructionMonths;
+    
+    // Get construction fee for this month based on empreendimento data
+    let constructionFee = 0;
+    if (isConstructionPeriod && summary.financedValue > 0) {
+      constructionFee = calculateMonthlyConstructionFee(
+        empreendimento,
+        month,
+        summary.financedValue
+      );
+    }
+    
+    // Calculate Pro Soluto payment based on income ceiling
+    // Formula: Parcela_Pro_Soluto = Teto_Mensal - Taxa_Obra_do_Mes
+    let proSolutoPayment = 0;
+    if (isWithinEntryTerm && remainingProSoluto > 0) {
+      const maxProSolutoThisMonth = Math.max(0, monthlyIncomeCeiling - constructionFee);
+      proSolutoPayment = Math.min(maxProSolutoThisMonth, remainingProSoluto);
+      remainingProSoluto -= proSolutoPayment;
+      totalPaid += proSolutoPayment;
+      
+      if (remainingProSoluto <= 0 && monthsToPayOff === 0) {
+        monthsToPayOff = month;
+      }
+    }
+    
+    const total = proSolutoPayment + constructionFee;
+    
+    // Calculate actual commitment percentage for this month
+    const actualCommitment = totalFamilyIncome > 0 
+      ? (total / totalFamilyIncome) * 100 
+      : 0;
+    
+    // Notes
+    let notes = '';
+    if (month === 1) notes = 'Início da simulação';
+    if (month === constructionMonths) notes = 'Previsão de Habite-se';
+    if (month === constructionMonths + 1) notes = 'Taxa de obra encerrada';
+    if (remainingProSoluto <= 0 && proSolutoPayment > 0) notes = 'Última parcela Pró-Soluto';
+    if (month === entry_term_months && remainingProSoluto > 0) notes = 'Prazo encerrado com saldo';
+    
+    flow.push({
+      month,
+      date: currentDate.toISOString().split('T')[0],
+      proSolutoPayment,
+      constructionFee,
+      total,
+      incomeCommitmentPercentage: actualCommitment,
+      notes,
+    });
+  }
+  
+  const residualBalance = Math.max(0, remainingProSoluto);
+  
+  return {
+    flow,
+    totalPaid,
+    residualBalance,
+    hasResidualBalance: residualBalance > 0,
+    monthlyIncomeCeiling,
+    commitmentPercentage,
+    monthsToPayOff: monthsToPayOff || entry_term_months,
+  };
+}
+
+/**
+ * Legacy function for backwards compatibility
+ * Use generateIncomeBasedProSolutoFlow for new implementations
+ */
 export function generateProSolutoFlow(
   summary: ProSolutoSummary,
   simulationParams: SimulationParams
 ): ProSolutoFlowRow[] {
-  const flow: ProSolutoFlowRow[] = [];
   const { entry_term_months, construction_months, construction_rate, simulation_start_date } = simulationParams;
   
   const startDate = new Date(simulation_start_date);
@@ -80,6 +217,8 @@ export function generateProSolutoFlow(
     ? summary.proSolutoTotal / entry_term_months 
     : 0;
   
+  const flow: ProSolutoFlowRow[] = [];
+  
   for (let month = 1; month <= totalMonths; month++) {
     const currentDate = new Date(startDate);
     currentDate.setMonth(currentDate.getMonth() + month - 1);
@@ -87,11 +226,8 @@ export function generateProSolutoFlow(
     const isWithinEntryTerm = month <= entry_term_months;
     const isConstructionPeriod = month <= construction_months;
     
-    // Pró-Soluto payment (only during entry term)
     const proSolutoPayment = isWithinEntryTerm ? monthlyProSoluto : 0;
     
-    // Construction fee calculation (based on financed value and progress)
-    // Simplified: assume linear progress during construction
     let constructionFee = 0;
     if (isConstructionPeriod && summary.financedValue > 0) {
       const progressPercentage = (month / construction_months) * 100;
@@ -101,7 +237,6 @@ export function generateProSolutoFlow(
     
     const total = proSolutoPayment + constructionFee;
     
-    // Notes
     let notes = '';
     if (month === 1) notes = 'Início da simulação';
     if (month === construction_months) notes = 'Previsão de Habite-se';
@@ -114,6 +249,7 @@ export function generateProSolutoFlow(
       proSolutoPayment,
       constructionFee,
       total,
+      incomeCommitmentPercentage: 0,
       notes,
     });
   }

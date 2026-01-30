@@ -2,7 +2,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import type { ProSolutoFlowRow, ProSolutoSummary } from './proSolutoCalculations';
 import type { Client, Property, Intermediary } from '@/types/proposal';
-import { formatCurrency, formatDate } from './calculations';
+import { formatCurrency, formatDate, formatPercentage } from './calculations';
 
 interface PdfData {
   clients: Client[];
@@ -13,6 +13,11 @@ interface PdfData {
   simulationDate: string;
   constructionMonths: number;
   entryTermMonths: number;
+  monthlyIncomeCeiling?: number;
+  commitmentPercentage?: number;
+  totalFamilyIncome?: number;
+  hasResidualBalance?: boolean;
+  residualBalance?: number;
 }
 
 export function generatePaymentFlowPdf(data: PdfData): void {
@@ -74,6 +79,32 @@ export function generatePaymentFlowPdf(data: PdfData): void {
   }
   
   yPos += 5;
+  
+  // Income Ceiling Info (if available)
+  if (data.monthlyIncomeCeiling && data.commitmentPercentage) {
+    doc.setFont('helvetica', 'bold');
+    doc.text('Limites de Comprometimento', 14, yPos);
+    yPos += 7;
+    
+    doc.setFont('helvetica', 'normal');
+    if (data.totalFamilyIncome) {
+      doc.text(`Renda Familiar: ${formatCurrency(data.totalFamilyIncome)}`, 14, yPos);
+      yPos += 5;
+    }
+    doc.text(`Limite: ${data.commitmentPercentage}% da renda`, 14, yPos);
+    yPos += 5;
+    doc.text(`Teto Mensal: ${formatCurrency(data.monthlyIncomeCeiling)}`, 14, yPos);
+    yPos += 5;
+    
+    if (data.hasResidualBalance && data.residualBalance) {
+      doc.setTextColor(220, 38, 38);
+      doc.text(`⚠️ Saldo Residual: ${formatCurrency(data.residualBalance)}`, 14, yPos);
+      doc.setTextColor(0, 0, 0);
+      yPos += 5;
+    }
+    
+    yPos += 5;
+  }
   
   // Financial Summary
   doc.setFont('helvetica', 'bold');
@@ -142,23 +173,25 @@ export function generatePaymentFlowPdf(data: PdfData): void {
     row.proSolutoPayment > 0 ? formatCurrency(row.proSolutoPayment) : '-',
     row.constructionFee > 0 ? formatCurrency(row.constructionFee) : '-',
     formatCurrency(row.total),
+    formatPercentage(row.incomeCommitmentPercentage || 0, 1),
     row.notes || '',
   ]);
   
   autoTable(doc, {
     startY: yPos,
-    head: [['Mês', 'Data', 'Pró-Soluto', 'Taxa Obra', 'Total', 'Obs.']],
+    head: [['Mês', 'Data', 'Pró-Soluto', 'Taxa Obra', 'Total', 'Compr.', 'Obs.']],
     body: tableData,
     theme: 'striped',
-    styles: { fontSize: 8, cellPadding: 2 },
+    styles: { fontSize: 7, cellPadding: 2 },
     headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
     columnStyles: {
-      0: { halign: 'center', cellWidth: 15 },
-      1: { halign: 'center', cellWidth: 22 },
-      2: { halign: 'right', cellWidth: 30 },
-      3: { halign: 'right', cellWidth: 28 },
-      4: { halign: 'right', cellWidth: 30, fontStyle: 'bold' },
-      5: { cellWidth: 'auto' },
+      0: { halign: 'center', cellWidth: 12 },
+      1: { halign: 'center', cellWidth: 18 },
+      2: { halign: 'right', cellWidth: 26 },
+      3: { halign: 'right', cellWidth: 24 },
+      4: { halign: 'right', cellWidth: 26, fontStyle: 'bold' },
+      5: { halign: 'center', cellWidth: 16 },
+      6: { cellWidth: 'auto' },
     },
     margin: { left: 14, right: 14 },
     didDrawPage: function(data) {
