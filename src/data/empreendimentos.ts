@@ -1,78 +1,78 @@
-// Empreendimentos data with monthly construction fee estimates
-// Based on real estate development data for MCMV projects
+// Empreendimentos data with monthly construction evolution percentages
+// Based on real estate development data (Previsão de Evolução de Obra)
+// Source: Planilha DADOS - jan/26 to dez/27
 
 export interface EmpreendimentoData {
   id: string;
   name: string;
   constructionMonths: number;
-  // Monthly construction fee estimates as percentage of financed value released
-  monthlyConstructionFees: number[];
+  startDate: string; // Reference start date (jan/26)
+  // Monthly evolution percentages (cumulative % of construction progress)
+  monthlyEvolutionPercentages: number[];
 }
 
-// Construction fee data based on typical MCMV development progress
-// These represent the estimated monthly "Taxa de Obra" as percentage
+// Construction evolution data based on the "Previsão de Evolução de Obra" spreadsheet
+// These represent the cumulative % of construction progress for each month
+// Starting from jan/26 through dez/27 (24 months)
 export const EMPREENDIMENTOS: EmpreendimentoData[] = [
   {
     id: 'reserva-equitativa',
     name: 'Reserva Equitativa',
-    constructionMonths: 36,
-    monthlyConstructionFees: [
-      0.10, 0.15, 0.20, 0.25, 0.30, 0.35, 0.40, 0.45, 0.50, 0.55,
-      0.60, 0.65, 0.70, 0.75, 0.80, 0.85, 0.90, 0.95, 1.00, 1.05,
-      1.10, 1.15, 1.20, 1.25, 1.30, 1.35, 1.40, 1.45, 1.50, 1.50,
-      1.50, 1.50, 1.45, 1.40, 1.35, 1.30,
+    constructionMonths: 18, // Until 100% at jun/27
+    startDate: '2026-01-01',
+    monthlyEvolutionPercentages: [
+      5, 13, 21, 28, 36, 42, 49, 53, 59, 64, 69, 77,  // jan-dez/26
+      85, 89, 92, 94, 96, 100, 106, 109, 113, 115, 115, 115, // jan-dez/27
     ],
   },
   {
     id: 'unic-primavera',
     name: 'Unic Primavera',
-    constructionMonths: 30,
-    monthlyConstructionFees: [
-      0.12, 0.18, 0.24, 0.30, 0.36, 0.42, 0.48, 0.54, 0.60, 0.66,
-      0.72, 0.78, 0.84, 0.90, 0.96, 1.02, 1.08, 1.14, 1.20, 1.26,
-      1.32, 1.38, 1.44, 1.50, 1.50, 1.48, 1.44, 1.40, 1.36, 1.32,
+    constructionMonths: 18, // Until 100% at jun/27
+    startDate: '2026-01-01',
+    monthlyEvolutionPercentages: [
+      7, 11, 21, 27, 35, 41, 48, 52, 57, 65, 68, 75,  // jan-dez/26
+      84, 88, 93, 94, 96, 100, 106, 109, 113, 115, 115, 115, // jan-dez/27
     ],
   },
   {
     id: 'liv-primavera',
     name: 'LIV Primavera',
-    constructionMonths: 28,
-    monthlyConstructionFees: [
-      0.15, 0.22, 0.29, 0.36, 0.43, 0.50, 0.57, 0.64, 0.71, 0.78,
-      0.85, 0.92, 1.00, 1.07, 1.14, 1.21, 1.28, 1.35, 1.42, 1.50,
-      1.50, 1.48, 1.45, 1.42, 1.38, 1.34, 1.30, 1.26,
+    constructionMonths: 18, // Until 100% at jun/27
+    startDate: '2026-01-01',
+    monthlyEvolutionPercentages: [
+      6, 13, 18, 26, 36, 42, 49, 55, 59, 64, 69, 77,  // jan-dez/26
+      85, 89, 94, 94, 96, 100, 106, 109, 113, 115, 115, 115, // jan-dez/27
     ],
   },
   {
     id: 'seleto-primavera',
     name: 'Seleto Primavera',
-    constructionMonths: 32,
-    monthlyConstructionFees: [
-      0.11, 0.16, 0.22, 0.27, 0.33, 0.38, 0.44, 0.49, 0.55, 0.60,
-      0.66, 0.71, 0.77, 0.82, 0.88, 0.93, 0.99, 1.04, 1.10, 1.15,
-      1.21, 1.26, 1.32, 1.37, 1.43, 1.48, 1.50, 1.50, 1.48, 1.45,
-      1.42, 1.38,
+    constructionMonths: 18, // Until 100% at jun/27
+    startDate: '2026-01-01',
+    monthlyEvolutionPercentages: [
+      3, 11, 21, 29, 36, 41, 48, 54, 60, 64, 70, 78,  // jan-dez/26
+      83, 87, 92, 94, 96, 100, 106, 109, 113, 115, 115, 115, // jan-dez/27
     ],
   },
   {
     id: 'unic-sao-goncalo',
     name: 'Unic São Gonçalo',
-    constructionMonths: 34,
-    monthlyConstructionFees: [
-      0.10, 0.14, 0.19, 0.24, 0.29, 0.33, 0.38, 0.43, 0.48, 0.52,
-      0.57, 0.62, 0.67, 0.71, 0.76, 0.81, 0.86, 0.90, 0.95, 1.00,
-      1.05, 1.10, 1.14, 1.19, 1.24, 1.29, 1.33, 1.38, 1.43, 1.48,
-      1.50, 1.50, 1.47, 1.43,
+    constructionMonths: 18, // Until 100% at jun/27
+    startDate: '2026-01-01',
+    monthlyEvolutionPercentages: [
+      5, 13, 21, 25, 33, 42, 47, 53, 59, 64, 67, 74,  // jan-dez/26
+      85, 89, 93, 94, 96, 100, 106, 109, 113, 115, 115, 115, // jan-dez/27
     ],
   },
   {
     id: 'prime-caxias',
     name: 'Prime Caxias',
-    constructionMonths: 26,
-    monthlyConstructionFees: [
-      0.18, 0.26, 0.35, 0.43, 0.52, 0.60, 0.69, 0.77, 0.86, 0.94,
-      1.03, 1.11, 1.20, 1.28, 1.37, 1.45, 1.50, 1.50, 1.50, 1.48,
-      1.45, 1.42, 1.38, 1.34, 1.30, 1.26,
+    constructionMonths: 18, // Until 100% at jun/27 (slightly above)
+    startDate: '2026-01-01',
+    monthlyEvolutionPercentages: [
+      4, 12, 20, 28, 34, 39, 45, 51, 59, 65, 69, 73,  // jan-dez/26
+      80, 86, 97, 99, 104, 106, 110, 113, 114, 115, 115, 115, // jan-dez/27
     ],
   },
 ];
@@ -86,32 +86,82 @@ export function getEmpreendimentoByName(name: string): EmpreendimentoData | unde
 }
 
 /**
- * Get the construction fee percentage for a specific month
+ * Get the evolution percentage for a specific month index
  * @param empreendimento - The selected development
- * @param month - Month number (1-indexed)
- * @returns The construction fee percentage for that month
+ * @param monthIndex - Month index (0-based, starting from jan/26)
+ * @returns The cumulative evolution percentage for that month
  */
-export function getMonthlyConstructionFeePercentage(
+export function getMonthlyEvolutionPercentage(
   empreendimento: EmpreendimentoData | undefined,
-  month: number
+  monthIndex: number
 ): number {
-  if (!empreendimento || month < 1) return 0;
-  if (month > empreendimento.constructionMonths) return 0;
-  return empreendimento.monthlyConstructionFees[month - 1] || 0;
+  if (!empreendimento || monthIndex < 0) return 0;
+  if (monthIndex >= empreendimento.monthlyEvolutionPercentages.length) {
+    // Return the last known percentage if we're past the data range
+    return empreendimento.monthlyEvolutionPercentages[empreendimento.monthlyEvolutionPercentages.length - 1] || 0;
+  }
+  return empreendimento.monthlyEvolutionPercentages[monthIndex] || 0;
 }
 
 /**
- * Calculate the actual construction fee amount for a month
+ * Get the month-over-month evolution delta (difference from previous month)
+ * This is the incremental evolution percentage for calculating construction fees
  * @param empreendimento - The selected development
- * @param month - Month number (1-indexed)
+ * @param monthIndex - Month index (0-based, starting from jan/26)
+ * @returns The evolution delta (percentage points) for that month
+ */
+export function getMonthlyEvolutionDelta(
+  empreendimento: EmpreendimentoData | undefined,
+  monthIndex: number
+): number {
+  if (!empreendimento || monthIndex < 0) return 0;
+  
+  const currentEvolution = getMonthlyEvolutionPercentage(empreendimento, monthIndex);
+  const previousEvolution = monthIndex > 0 
+    ? getMonthlyEvolutionPercentage(empreendimento, monthIndex - 1) 
+    : 0;
+  
+  return Math.max(0, currentEvolution - previousEvolution);
+}
+
+/**
+ * Calculate the construction fee for a specific month based on evolution percentage
+ * Formula: Taxa_Obra = Valor_Financiamento * (Percentual_Evolução_Mês / 100) * Taxa_Juros_Mensal
+ * 
+ * Simplified formula used: Taxa_Obra = Valor_Financiamento * (Percentual_Acumulado / 100) * 0.009 (0.9% monthly)
+ * 
+ * @param empreendimento - The selected development
+ * @param monthIndex - Month index (0-based)
  * @param financedValue - Total financed value
+ * @param monthlyRate - Monthly interest rate (default 0.9% = 0.009)
  * @returns The construction fee amount in currency
  */
 export function calculateMonthlyConstructionFee(
   empreendimento: EmpreendimentoData | undefined,
-  month: number,
-  financedValue: number
+  monthIndex: number,
+  financedValue: number,
+  monthlyRate: number = 0.009
 ): number {
-  const percentage = getMonthlyConstructionFeePercentage(empreendimento, month);
-  return (financedValue * percentage) / 100;
+  const evolutionPercentage = getMonthlyEvolutionPercentage(empreendimento, monthIndex);
+  // Taxa de Obra = Valor Financiado * (% Evolução Acumulada / 100) * Taxa Mensal
+  return (financedValue * (evolutionPercentage / 100) * monthlyRate);
+}
+
+/**
+ * Get the month index based on a date relative to the empreendimento start date
+ * @param empreendimento - The selected development  
+ * @param date - The target date
+ * @returns Month index (0-based) or -1 if before start
+ */
+export function getMonthIndexFromDate(
+  empreendimento: EmpreendimentoData | undefined,
+  date: Date
+): number {
+  if (!empreendimento) return -1;
+  
+  const startDate = new Date(empreendimento.startDate);
+  const yearDiff = date.getFullYear() - startDate.getFullYear();
+  const monthDiff = date.getMonth() - startDate.getMonth();
+  
+  return yearDiff * 12 + monthDiff;
 }

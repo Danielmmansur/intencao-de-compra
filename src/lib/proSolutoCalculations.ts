@@ -1,13 +1,20 @@
 import type { ApprovalLetter, SimulationParams, Property, Campaign, Client } from '@/types/proposal';
-import { getEmpreendimentoById, calculateMonthlyConstructionFee } from '@/data/empreendimentos';
+import { 
+  getEmpreendimentoById, 
+  calculateMonthlyConstructionFee,
+  getMonthlyEvolutionPercentage,
+  getMonthIndexFromDate,
+} from '@/data/empreendimentos';
 
 export interface ProSolutoFlowRow {
   month: number;
   date: string;
+  evolutionPercentage: number; // % Evolução informativo
   proSolutoPayment: number;
   constructionFee: number;
   total: number;
   incomeCommitmentPercentage: number;
+  isConstructionFeeOverLimit: boolean; // Alert when construction fee alone exceeds income ceiling
   notes?: string;
 }
 
@@ -134,17 +141,29 @@ export function generateIncomeBasedProSolutoFlow(
     currentDate.setMonth(currentDate.getMonth() + month - 1);
     
     const isWithinEntryTerm = month <= entry_term_months;
-    const isConstructionPeriod = month <= constructionMonths;
     
-    // Get construction fee for this month based on empreendimento data
+    // Calculate month index relative to empreendimento start date
+    const monthIndex = empreendimento 
+      ? getMonthIndexFromDate(empreendimento, currentDate) 
+      : month - 1;
+    
+    // Get evolution percentage for this month (informative)
+    const evolutionPercentage = getMonthlyEvolutionPercentage(empreendimento, monthIndex);
+    
+    // Calculate construction fee based on cumulative evolution percentage
+    // Formula: Taxa_Obra = Valor_Financiamento * (% Evolução / 100) * Taxa_Mensal (0.9%)
     let constructionFee = 0;
-    if (isConstructionPeriod && summary.financedValue > 0) {
+    if (evolutionPercentage > 0 && evolutionPercentage < 100 && summary.financedValue > 0) {
       constructionFee = calculateMonthlyConstructionFee(
         empreendimento,
-        month,
-        summary.financedValue
+        monthIndex,
+        summary.financedValue,
+        simulationParams.construction_rate
       );
     }
+    
+    // Check if construction fee alone exceeds income ceiling
+    const isConstructionFeeOverLimit = constructionFee > monthlyIncomeCeiling;
     
     // Calculate Pro Soluto payment based on income ceiling
     // Formula: Parcela_Pro_Soluto = Teto_Mensal - Taxa_Obra_do_Mes
@@ -170,18 +189,24 @@ export function generateIncomeBasedProSolutoFlow(
     // Notes
     let notes = '';
     if (month === 1) notes = 'Início da simulação';
-    if (month === constructionMonths) notes = 'Previsão de Habite-se';
-    if (month === constructionMonths + 1) notes = 'Taxa de obra encerrada';
+    if (evolutionPercentage >= 100 && month > 1) {
+      const prevEvolution = getMonthlyEvolutionPercentage(empreendimento, monthIndex - 1);
+      if (prevEvolution < 100) notes = 'Previsão de Habite-se';
+    }
+    if (evolutionPercentage >= 100) notes = notes || 'Obra concluída';
+    if (isConstructionFeeOverLimit) notes = 'ALERTA: Taxa de obra > capacidade';
     if (remainingProSoluto <= 0 && proSolutoPayment > 0) notes = 'Última parcela Pró-Soluto';
     if (month === entry_term_months && remainingProSoluto > 0) notes = 'Prazo encerrado com saldo';
     
     flow.push({
       month,
       date: currentDate.toISOString().split('T')[0],
+      evolutionPercentage,
       proSolutoPayment,
       constructionFee,
       total,
       incomeCommitmentPercentage: actualCommitment,
+      isConstructionFeeOverLimit,
       notes,
     });
   }
@@ -236,6 +261,7 @@ export function generateProSolutoFlow(
     }
     
     const total = proSolutoPayment + constructionFee;
+    const evolutionPercentage = isConstructionPeriod ? (month / construction_months) * 100 : 100;
     
     let notes = '';
     if (month === 1) notes = 'Início da simulação';
@@ -246,10 +272,12 @@ export function generateProSolutoFlow(
     flow.push({
       month,
       date: currentDate.toISOString().split('T')[0],
+      evolutionPercentage,
       proSolutoPayment,
       constructionFee,
       total,
       incomeCommitmentPercentage: 0,
+      isConstructionFeeOverLimit: false,
       notes,
     });
   }

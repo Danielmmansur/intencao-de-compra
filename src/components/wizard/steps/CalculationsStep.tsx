@@ -320,6 +320,7 @@ export function CalculationsStep() {
                 <tr>
                   <th className="w-16">Mês</th>
                   <th className="w-24">Data</th>
+                  <th className="text-right">% Evolução</th>
                   <th className="text-right">Pró-Soluto</th>
                   <th className="text-right">Taxa Obra</th>
                   <th className="text-right font-bold">Total</th>
@@ -329,14 +330,14 @@ export function CalculationsStep() {
               </thead>
               <tbody>
                 {paymentFlow.map((row) => {
-                  const constructionMonths = empreendimento?.constructionMonths || simulation_params.construction_months;
+                  const isCompleted = row.evolutionPercentage >= 100;
                   return (
                     <tr
                       key={row.month}
                       className={
-                        row.month === constructionMonths
-                          ? 'bg-success/10'
-                          : row.month > constructionMonths
+                        row.isConstructionFeeOverLimit
+                          ? 'bg-destructive/20 text-destructive'
+                          : isCompleted
                           ? 'bg-muted/30'
                           : ''
                       }
@@ -347,6 +348,9 @@ export function CalculationsStep() {
                           month: 'short',
                           year: '2-digit',
                         })}
+                      </td>
+                      <td className="text-right font-mono text-sm">
+                        {row.evolutionPercentage > 0 ? `${row.evolutionPercentage.toFixed(0)}%` : '-'}
                       </td>
                       <td className="text-right font-mono">
                         {row.proSolutoPayment > 0 ? formatCurrency(row.proSolutoPayment) : '-'}
@@ -365,7 +369,15 @@ export function CalculationsStep() {
                           {formatPercentage(row.incomeCommitmentPercentage, 1)}
                         </Badge>
                       </td>
-                      <td className="text-xs text-muted-foreground">{row.notes}</td>
+                      <td className="text-xs text-muted-foreground">
+                        {row.isConstructionFeeOverLimit && (
+                          <span className="flex items-center gap-1 text-destructive font-medium">
+                            <AlertTriangle className="h-3 w-3" />
+                            Taxa &gt; Teto
+                          </span>
+                        )}
+                        {!row.isConstructionFeeOverLimit && row.notes}
+                      </td>
                     </tr>
                   );
                 })}
@@ -373,10 +385,23 @@ export function CalculationsStep() {
             </table>
           </ScrollArea>
 
+          {/* Alert when any month has construction fee over limit */}
+          {paymentFlow.some(row => row.isConstructionFeeOverLimit) && (
+            <Alert variant="destructive" className="mt-4">
+              <AlertTriangle className="h-4 w-4" />
+              <AlertTitle>Alerta: Taxa de obra superior à capacidade de pagamento</AlertTitle>
+              <AlertDescription>
+                Em alguns meses, a Taxa de Evolução de Obra sozinha ultrapassa o teto de comprometimento 
+                de renda ({commitmentPercentage}% = {formatCurrency(monthlyIncomeCeiling)}). 
+                Considere aumentar a renda ou adicionar um fiador.
+              </AlertDescription>
+            </Alert>
+          )}
+
           <div className="mt-4 p-3 bg-muted/50 rounded-lg">
             <p className="text-sm text-muted-foreground">
-              <strong>Legenda:</strong> Pró-Soluto = Teto Mensal - Taxa de Obra (respeitando o limite de {commitmentPercentage}%) | 
-              Taxa de Obra = juros sobre valor liberado do financiamento (dados do empreendimento)
+              <strong>Legenda:</strong> Taxa de Obra = Valor Financiado × % Evolução × 0,9% | 
+              Pró-Soluto = Teto Mensal - Taxa de Obra (limitado ao saldo devedor)
             </p>
           </div>
         </CardContent>
