@@ -240,54 +240,6 @@ export function SimulationStep() {
           </CardContent>
         </Card>
 
-        {/* Taxa de Obra */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-lg">
-              <TrendingUp className="h-5 w-5 text-primary" />
-              Taxa de Evolução de Obra
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label>Taxa de Juros Mensal (estimativa)</Label>
-              <div className="flex items-center gap-2">
-                <Input
-                  type="number"
-                  step="0.01"
-                  value={(simulation_params.construction_rate * 100).toFixed(2)}
-                  onChange={(e) =>
-                    updateParams({ construction_rate: parseFloat(e.target.value) / 100 || 0 })
-                  }
-                  className="w-24 text-right font-mono"
-                />
-                <span className="text-muted-foreground">% a.m.</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-2">
-                Padrão: 0,90% a.m. (aproximadamente 11% a.a.)
-              </p>
-            </div>
-
-            <div className="flex items-center space-x-2 pt-4 border-t">
-              <Switch
-                id="annual-adjustment"
-                checked={simulation_params.apply_annual_adjustment}
-                onCheckedChange={(checked) =>
-                  updateParams({ apply_annual_adjustment: checked })
-                }
-              />
-              <Label htmlFor="annual-adjustment" className="cursor-pointer">
-                Aplicar reajuste anual na prestação
-              </Label>
-            </div>
-
-            <div className="p-3 bg-warning/10 border border-warning/30 rounded-lg mt-4">
-              <p className="text-xs text-warning">
-                ⚠️ Valor estimativo - pode variar conforme medições do banco.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   );
