@@ -170,30 +170,40 @@ export function generatePaymentFlowPdf(data: PdfData): void {
   const tableData = data.flow.map(row => [
     row.month.toString(),
     new Date(row.date).toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }),
+    row.evolutionPercentage > 0 ? `${row.evolutionPercentage.toFixed(0)}%` : '-',
     row.proSolutoPayment > 0 ? formatCurrency(row.proSolutoPayment) : '-',
     row.constructionFee > 0 ? formatCurrency(row.constructionFee) : '-',
     formatCurrency(row.total),
     formatPercentage(row.incomeCommitmentPercentage || 0, 1),
-    row.notes || '',
+    row.isConstructionFeeOverLimit ? '⚠️ ALERTA' : (row.notes || ''),
   ]);
   
   autoTable(doc, {
     startY: yPos,
-    head: [['Mês', 'Data', 'Pró-Soluto', 'Taxa Obra', 'Total', 'Compr.', 'Obs.']],
+    head: [['Mês', 'Data', '% Evol.', 'Pró-Soluto', 'Taxa Obra', 'Total', 'Compr.', 'Obs.']],
     body: tableData,
     theme: 'striped',
     styles: { fontSize: 7, cellPadding: 2 },
     headStyles: { fillColor: [59, 130, 246], textColor: 255, fontStyle: 'bold' },
     columnStyles: {
-      0: { halign: 'center', cellWidth: 12 },
-      1: { halign: 'center', cellWidth: 18 },
-      2: { halign: 'right', cellWidth: 26 },
+      0: { halign: 'center', cellWidth: 10 },
+      1: { halign: 'center', cellWidth: 16 },
+      2: { halign: 'center', cellWidth: 14 },
       3: { halign: 'right', cellWidth: 24 },
-      4: { halign: 'right', cellWidth: 26, fontStyle: 'bold' },
-      5: { halign: 'center', cellWidth: 16 },
-      6: { cellWidth: 'auto' },
+      4: { halign: 'right', cellWidth: 22 },
+      5: { halign: 'right', cellWidth: 24, fontStyle: 'bold' },
+      6: { halign: 'center', cellWidth: 14 },
+      7: { cellWidth: 'auto' },
     },
     margin: { left: 14, right: 14 },
+    didParseCell: function(hookData) {
+      // Highlight rows where construction fee exceeds income ceiling
+      const rowIndex = hookData.row.index;
+      if (rowIndex >= 0 && data.flow[rowIndex]?.isConstructionFeeOverLimit) {
+        hookData.cell.styles.fillColor = [254, 202, 202];
+        hookData.cell.styles.textColor = [153, 27, 27];
+      }
+    },
     didDrawPage: function(data) {
       // Footer on each page
       doc.setFontSize(8);
